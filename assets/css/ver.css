@@ -1,0 +1,110 @@
+body {
+            margin: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background-color: #008800;
+            overflow: hidden;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .navbar li {
+            margin: 0;
+        }
+
+        .navbar a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilos adicionales para mejorar la apariencia en pantallas pequeñas */
+        @media (max-width: 600px) {
+            .navbar ul {
+                flex-direction: column;
+            }
+
+            .navbar a {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+        body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    background-color: dimgray;
+}
+
+header {
+    background-color: #008800;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+article {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+h2 {
+    color: #008800;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 20px;
+}
+
+a {
+    background-color: #008800;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+a:hover {
+    background-color: #006600;
+}
+
+.flashes {
+    padding: 0;
+}
+
+.flashes li {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    list-style: none;
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyFinance Crear pago</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <link rel="manifest" href="/static/img/site.webmanifest">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+
+        /*function validacion(){
+
+            var Nickname = document.getElementById('Nickname').value;
+            var Nombre = document.getElementById('Nombre').value;
+            var Apellidos = document.getElementById('Apellidos').value;
+            var Correo = document.getElementById('Correo').value;
+            var Contrasena = document.getElementById('Contrasena').value;
+
+
+            if (Nickname === '' || Nombre === ''  || Apellidos===''||  Correo === '' || Contrasena === '') {
+            alert('Completa todos los campos obligatorios');
+            } else {
+                
+                alert('Te registraste correctamente');
+            }
+            document.forma01.method = 'POST';
+            document.forma01.action = '/SignIn';
+            document.forma01.submit();
+            }*/
+
+    </script>
+</head>
+<body>
+    <header class="hero_signin">
+        <nav class="nav container">
+            <div class="nav_logo">
+                <h2 class="nav_title">PyFinance</h2>
+            </div>
+            <ul class="nav_link nav_link--menu">
+                <li class="nav_items">
+                    <a href="{{url_for('Home')}}" class="cta">Home</a>
+                </li>
+                <img src="/static/img/close.svg" alt="close" class="nav_close">
+            </ul>
+            <div class="nav_menu">
+                <img src="/static/img/menu.svg" alt="menu" class="nav_img">
+            </div>
+        </nav>
+        
+    </header>
+
+    <main>
+        <form method="POST" action="/pagoFormCreate" class="form">
+    
+            <h3 class="subtitle">Bienvenido a tu Registro</h3>
+            <p class="about_paragraph">Ingresa los datos que se te piden para realizar un pago</p>
+            {{form.hidden_tag()}}
+    
+            <label>{{form.Nombre_pago.label}}
+                {{form.Nombre_pago(placeholder="Nombre del pago: ", id="Nombre_pago")}}
+            </label><br>
+    
+            <label>{{form.Fecha_creacion.label}}
+                {{form.Fecha_creacion(placeholder="Escribe la fecha de creación: ", id="Fecha_creacion")}}
+            </label><br>
+    
+            <label>{{form.Fecha_pago.label}}
+                {{form.Fecha_pago(placeholder="Escribe la fecha de pago: ", id="Fecha_pago")}}
+            </label><br>
+
+            <label>{{form.Cantidad_a_pagar.label}}
+                {{form.Cantidad_a_pagar(placeholder="Escribe la cantidad de pago: ", id="Cantidad_a_pagar")}}
+            </label><br>
+
+            <label>{{form.ID_usuario.label}}
+                {{form.ID_usuario(placeholder="Escribe el ID del usuario: ", id="ID_usuario")}}
+            </label><br>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>ID del Usuario</th>
+                        <th>Nombre del Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuario %}
+                    <tr>
+                        <td>{{ usuario.ID_usuario }}</td>
+                        <td>{{ usuario.Nombre }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{form.submit()}}
+        </form>
+    </main>
