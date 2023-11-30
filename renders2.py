@@ -81,16 +81,15 @@ def Login():
 def startPage():
     user_id=current_user.id
     '''
-    cantidad_pagada=obtener_cantidad_pagada(user_id)
     racha_pagos_a_tiempo=obtener_racha_pagos_a_tiempo(user_id)
     pagos_pendientes=obtener_pagos_pendientes(user_id)
     pagos_completados=obtener_pagos_completados(user_id)
     print("Pagos completados del mes: ",pagos_completados)
 
-            cantidad_pagada=cantidad_pagada,
-        racha_pagos_a_tiempo=racha_pagos_a_tiempo,
-        pagos_pendientes=pagos_pendientes,
-        pagos_completados=pagos_completados
+    cantidad_pagada=cantidad_pagada,
+    racha_pagos_a_tiempo=racha_pagos_a_tiempo,
+    pagos_pendientes=pagos_pendientes,
+    pagos_completados=pagos_completados
     '''
     return render_template(
         "startPage.html",
