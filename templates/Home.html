@@ -10,40 +10,115 @@
     <link rel="manifest" href="/static/img/site.webmanifest">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+<style>
+    /* Estilo del cuerpo (body) */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+/* Estilo de la sección de bienvenida */
+.hero_container {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.hero_title {
+    font-size: 2.5em;
+    color: #4285f4;
+}
+
+.hero_paragraph {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.cta {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    text-decoration: none;
+    background-color: #4285f4;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.cta:hover {
+    background-color: #3367d6;
+}
+
+/* Estilo de la sección "¿Qué es PyFinance?" */
+.about {
+    padding: 50px 0;
+}
+
+.subtitle {
+    color: #4285f4;
+}
+
+.about_paragraph {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Estilo de la sección "Ofrecemos" */
+.Ofrecemos_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 0;
+}
+
+.Ofrecemos_texts {
+    width: 50%;
+}
+
+.Ofrecemos_paragraph {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.Ofrecemos_picture {
+    width: 40%;
+}
+
+.Ofrecemos_img {
+    width: 100%;
+    height: auto;
+}
+
+.Ofrecemos_main {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.Ofrecemos_icons {
+    text-align: center;
+}
+
+.Ofrecemos_icon {
+    width: 50px;
+    height: 50px;
+}
+
+.Ofrecemos_title {
+    margin-top: 10px;
+    font-size: 1.2em;
+    color: #4285f4;
+}
+
+</style>
 <body>
-    <header class="hero" id="inicio">
-        <nav class="nav container">
-            <div class="nav_logo">
-                <h2 class="nav_title">PyFinance</h2>
-            </div>
-            <ul class="nav_link nav_link--menu">
-                <li class="nav_items">
-                    <a href="#inicio" class="nav_links">Inicio</a>
-                </li>
-                <li class="nav_items">
-                    <a href="#about" class="nav_links">Acerca de nosotros</a>
-                </li>
-                <li class="nav_items">
-                    <a href="#ofer" class="nav_links">Ofrecemos</a>
-                </li>
-                <li class="nav_items">
-                    <a href="#contact" class="nav_links">Contacto</a>
-                </li>
 
-                <li class="nav_items">
-                    <a href="{{url_for('Login')}}" class="cta">Inicia sesion</a>
-                </li>
-
-                <img src="/static/img/close.svg" alt="close" class="nav_close">
-            </ul>
-            <div class="nav_menu">
-                <img src="/static/img/menu.svg" alt="menu" class="nav_img">
-            </div>
-        </nav>
         <section class="hero_container container">
             <h1 class="hero_title">Bienvenido a PyFinance</h1>
             <p class="hero_paragraph">Administra tu vida aqui</p>
             <a href="{{url_for('Signin')}}" class="cta">Crea una cuenta</a>
+            <a href="{{url_for('Login')}}" class="cta">Inicia sesión</a>
         </section>
     </header>
     <main>
@@ -115,29 +190,10 @@
         </section>
     </main>
     <footer class="footer" id="contact">
-        <section class="footer_container container">
-            <nav class="nav nav--footer">
-                <h2 class="footer_title">PyFinance</h2>
-                <ul class="nav_link nav_link--footer">
-                    <li class="nav_items">
-                        <a href="#inicio" class="nav_links">Inicio</a>
-                    </li>
-                    <li class="nav_items">
-                        <a href="#about" class="nav_links">Acerca de nosotros</a>
-                    </li>
-                    <li class="nav_items">
-                        <a href="#ofer" class="nav_links">Ofrecemos</a>
-                    </li>
-                    <li class="nav_items">
-                        <a href="#contact" class="nav_links">Contacto</a>
-                    </li>
-                </ul>
-            </nav>
-        </section>
         <section class="footer_copy container">
             <div class="footer_social">
-                <a href="#" class="footer_icons"><img src="/static/img/gmail.svg" alt="logoGmail" class="footer_img"></a>
-                <a href="#" class="footer_icons"><img src="/static/img/whatsapp.svg" alt="logoWhatsapp" class="footer_img"></a>
+                <a href="mailto:taquion@gmail.com" class="footer_icons"><img src="/static/img/gmail.svg" alt="logoGmail" class="footer_img"></a>
+                <a href="tel:+3333333333" class="footer_icons"><img src="/static/img/whatsapp.svg" alt="logoWhatsapp" class="footer_img"></a>
             </div>
             <h3 class="footer_copyright">Derechos reservados &copy; TaquionTeam</h3>
         </section>

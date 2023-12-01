@@ -8,30 +8,162 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
     <link rel="manifest" href="/static/img/site.webmanifest">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script>
+    <style>
+/* Estilo de la barra de navegación */
+.hero_signin {
+    background-color: #4285f4;
+    color: #fff;
+    padding: 20px 0;
+}
 
-        /*function validacion(){
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-            var Nickname = document.getElementById('Nickname').value;
-            var Nombre = document.getElementById('Nombre').value;
-            var Apellidos = document.getElementById('Apellidos').value;
-            var Correo = document.getElementById('Correo').value;
-            var Contrasena = document.getElementById('Contrasena').value;
+.nav_logo {
+    flex: 1;
+}
 
+.nav_title {
+    font-size: 1.5em;
+    margin: 0;
+}
 
-            if (Nickname === '' || Nombre === ''  || Apellidos===''||  Correo === '' || Contrasena === '') {
-            alert('Completa todos los campos obligatorios');
-            } else {
-                
-                alert('Te registraste correctamente');
-            }
-            document.forma01.method = 'POST';
-            document.forma01.action = '/SignIn';
-            document.forma01.submit();
-            }*/
+.nav_link--menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
 
-    </script>
+.nav_items {
+    margin: 0 15px;
+}
+
+.cta {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.nav_close {
+    display: none;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.nav_menu {
+    display: none;
+    cursor: pointer;
+}
+
+.nav_img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Estilo del formulario de registro */
+.form {
+    max-width: 400px;
+    margin: auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    color: #4285f4;
+}
+
+.about_paragraph {
+    font-size: 1em;
+    color: #666;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Estilo del botón de enviar */
+input[type="submit"] {
+    background-color: #4285f4;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Cambio de estilo al pasar el ratón sobre el botón de enviar */
+input[type="submit"]:hover {
+    background-color: #3367d6;
+}
+
+/* Estilo para mensajes de error (puedes adaptar según necesites) */
+.error-message {
+    color: #d9534f;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Estilo para mensajes de éxito (puedes adaptar según necesites) */
+.success-message {
+    color: #5bc0de;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Estilo del pie de página */
+.footer {
+    background-color: #4285f4;
+    color: #fff;
+    padding: 30px 0;
+    text-align: center;
+}
+
+.footer_container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav--footer {
+    display: flex;
+    align-items: center;
+}
+
+.footer_title {
+    font-size: 1.5em;
+}
+
+.nav_link--footer {
+    list-style: none;
+    display: flex;
+}
+
+.nav_links {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.footer_social {
+    display: flex;
+    align-items: center;
+    margin-bott
+}
+    </style>
 </head>
 <body>
     <header class="hero_signin">
@@ -104,8 +236,8 @@
         </section>
         <section class="footer_copy container">
             <div class="footer_social">
-                <a href="#" class="footer_icons"><img src="/static/img/gmail.svg" alt="logoGmail" class="footer_img"></a>
-                <a href="#" class="footer_icons"><img src="/static/img/whatsapp.svg" alt="logoWhatsapp" class="footer_img"></a>
+                <a href="mailto:taquion@gmail.com" class="footer_icons"><img src="/static/img/gmail.svg" alt="logoGmail" class="footer_img"></a>
+                <a href="tel:+3333333333" class="footer_icons"><img src="/static/img/whatsapp.svg" alt="logoWhatsapp" class="footer_img"></a>
             </div>
             <h3 class="footer_copyright">Derechos reservados &copy; TaquionTeam</h3>
         </section>

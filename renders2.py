@@ -124,6 +124,7 @@ def grupoFormCreate():
             # Modifica la consulta para incluir el ID del usuario actual como ID_administrador
             cur.execute('INSERT INTO "Grupos" ("Nombre_grupo", "ID_administrador", "Descripción", "Contrasena") VALUES (%s, %s, %s, %s);', (Nombre_grupo, id_usuario_actual, Descripción, Contrasena))
             conn.commit()
+            flash('Grupo creado exitosamente', 'success')
         except (psycopg2.DatabaseError, Exception) as error:
             print(error)
             # Maneja el error según tus necesidades
@@ -166,7 +167,8 @@ def grupoFormJoin():
                     VALUES (%s, %s, %s, %s);
                 ''', (current_user.id, IdGrupo, fecha_actual, False))
                 conn.commit()
-                return redirect(url_for('gruposView'))
+                flash('Te uniste al grupo.', 'success')
+                return redirect(url_for('gruposPertenece'))
             else:
                 print('error')
         except (psycopg2.DatabaseError, Exception) as error:
@@ -438,7 +440,7 @@ def pagoFormCreate(grupo_id):
                 cur.execute('INSERT INTO public."Pagos" ("ID_grupo", "ID_usuario", "Nombre_pago", "Fecha_creacion", "Fecha_pago", "Estatus_pago") VALUES (%s, %s, %s, %s, %s, %s);', (grupo_id, id_usuario, nombre_pago, fecha_creacion, fecha_pago, False))
 
             conn.commit()
-
+            flash('Pago asignado.', 'success')
             return redirect(url_for('gruposView'))
 
     except (psycopg2.DatabaseError, Exception) as error:

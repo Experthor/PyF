@@ -183,7 +183,7 @@
             {% for grupo in grupos_pertenecientes %}
                 <li>
                     <strong>Nombre del Grupo:</strong> {{ grupo[0] }}<br>
-                    <strong>Descripción:</strong> {{ grupo[1] }}<br>
+                    <strong>ID del grupo:</strong> {{ grupo[1] }}<br>
                     <!-- Puedes agregar aquí cualquier otra información específica de los grupos a los que perteneces -->
                 <a href="{{ url_for('ver_miembros', grupo_id=grupo[1]) }}">Ver Miembros</a>
             <br>
