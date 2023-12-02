@@ -79,22 +79,20 @@ def Login():
 @app.route('/startPage')
 @login_required
 def startPage():
-    user_id=current_user.id
-    '''
-    racha_pagos_a_tiempo=obtener_racha_pagos_a_tiempo(user_id)
-    pagos_pendientes=obtener_pagos_pendientes(user_id)
-    pagos_completados=obtener_pagos_completados(user_id)
-    print("Pagos completados del mes: ",pagos_completados)
+    
+    user_id = current_user.id
+    cantidad_pagada=obtener_cantidad_pagada(user_id)
+    pagos_pendientes = obtener_pagos_pendientes(user_id)
+    pagos_completados = obtener_pagos_completados(user_id)
+    print("Pagos completados del mes: ", pagos_completados)
 
-    cantidad_pagada=cantidad_pagada,
-    racha_pagos_a_tiempo=racha_pagos_a_tiempo,
-    pagos_pendientes=pagos_pendientes,
-    pagos_completados=pagos_completados
-    '''
     return render_template(
         "startPage.html",
+        cantidad_pagada=cantidad_pagada,
+        pagos_pendientes=pagos_pendientes,
+        pagos_completados=pagos_completados,
         url_for=url_for
-        )
+    )
 
 #aqui terminan las paginas principales
 
@@ -346,7 +344,7 @@ def ver_pagos(grupo_id):
         id_usuario_actual = current_user.id
         # Obtener la lista de pagos del grupo
         cur.execute('''
-            SELECT "ID_pago", "Nombre_pago", "Fecha_creacion", "Estatus_pago", "ID_usuario"
+            SELECT "ID_pago", "Nombre_pago", "Fecha_creacion", "Estatus_pago", "ID_usuario", "Cantidad_a_pagar"
             FROM public."Pagos"
             WHERE "ID_grupo" = %s AND "ID_usuario" = %s;
         ''', (grupo_id, id_usuario_actual))
@@ -376,7 +374,7 @@ def verPago(grupo_id):
         id_usuario_actual = current_user.id
         # Obtener la lista de pagos del grupo
         cur.execute('''
-            SELECT p."ID_pago", p."Nombre_pago", p."Fecha_creacion", p."Estatus_pago",
+            SELECT p."ID_pago", p."Nombre_pago", p."Fecha_creacion", p."Estatus_pago", p."Cantidad_a_pagar",
                    u."ID_usuario", u."Nombre"
             FROM public."Pagos" p
             INNER JOIN public."Usuarios" u ON p."ID_usuario" = u."ID_usuario"
@@ -403,7 +401,8 @@ def verPago(grupo_id):
 #Html's dentro de htmlsPagos
 class PagoFormCreate(FlaskForm):
     Nombre_pago = StringField('Nombre del Pago', validators=[DataRequired()])
-    Fecha_pago = DateField('Fecha del pago', validators=[DataRequired()])
+    Fecha_limite = DateField('Fecha límite del pago', validators=[DataRequired()])
+    Cantidad_a_pagar = StringField('Cantidad a Pagar', validators=[DataRequired()])
     submit = SubmitField('Unirse al Grupo')
 
 @app.route('/htmlsGrupos/pagoFormCreate/<int:grupo_id>', methods=['GET', 'POST'])
@@ -423,9 +422,9 @@ def pagoFormCreate(grupo_id):
 
         if request.method == 'POST' and form.validate():
             fecha_creacion = datetime.today().strftime('%Y-%m-%d')
-            fecha_pago = form.Fecha_pago.data
+            fecha_limite = form.Fecha_limite.data
             nombre_pago = form.Nombre_pago.data
-
+            cantidad_a_pagar = float(form.Cantidad_a_pagar.data)
             # Obtener miembros del grupo
             cur.execute('SELECT "ID_usr" FROM public."Pertenece" WHERE "ID_gru" = %s;', (grupo_id,))
             miembros = cur.fetchall()
@@ -437,7 +436,7 @@ def pagoFormCreate(grupo_id):
             for miembro in miembros:
                 id_usuario = miembro[0]
                 ids_usuario.append(id_usuario)
-                cur.execute('INSERT INTO public."Pagos" ("ID_grupo", "ID_usuario", "Nombre_pago", "Fecha_creacion", "Fecha_pago", "Estatus_pago") VALUES (%s, %s, %s, %s, %s, %s);', (grupo_id, id_usuario, nombre_pago, fecha_creacion, fecha_pago, False))
+                cur.execute('INSERT INTO public."Pagos" ("ID_grupo", "ID_usuario", "Nombre_pago", "Fecha_creacion", "Fecha_limite", "Estatus_pago", "Cantidad_a_pagar") VALUES (%s, %s, %s, %s, %s, %s, %s);', (grupo_id, id_usuario, nombre_pago, fecha_creacion, fecha_pago, False, cantidad_a_pagar))
 
             conn.commit()
             flash('Pago asignado.', 'success')
@@ -466,7 +465,8 @@ def pagar(grupo_id, pago_id):
     try:
         cur.execute('''
             UPDATE public."Pagos"
-            SET "Estatus_pago" = TRUE
+            SET "Estatus_pago" = TRUE,
+            "Fecha_pago" = CURRENT_DATE
             WHERE "ID_pago" = %s;
         ''', (pago_id,))
 
@@ -485,12 +485,33 @@ def pagar(grupo_id, pago_id):
             conn.close()
 
     return redirect(url_for('ver_pagos', grupo_id=grupo_id))
-# Método para obtener la racha de pagos a tiempo del usuario
-def obtener_racha_pagos_a_tiempo(user_id):
+
+
+def obtener_cantidad_pagada(user_id):
+    # Ejemplo: Obtener la cantidad de dinero pagada por el usuario en el mes actual
     conn = conectar()
     cur = conn.cursor()
     try:
         cur.execute('''
+            SELECT SUM("Cantidad_a_pagar")
+            FROM "Pagos"
+            WHERE "ID_usuario" = %s
+              AND "Estatus_pago" = true
+              AND EXTRACT(MONTH FROM "Fecha_pago") = EXTRACT(MONTH FROM CURRENT_DATE);
+        ''', (user_id,))
+        cantidad_pagada = cur.fetchone()[0]
+        return cantidad_pagada if cantidad_pagada else 0
+    finally:
+        cur.close()
+        conn.close()
+
+
+# Método para obtener la racha de pagos a tiempo del usuario
+'''def obtener_racha_pagos_a_tiempo(user_id):
+    conn = conectar()
+    cur = conn.cursor()
+    try:
+        cur.execute(
             SELECT 
                 "ID_pago",
                 "Nombre_pago",
@@ -498,7 +519,7 @@ def obtener_racha_pagos_a_tiempo(user_id):
                 "Fecha_pago",
                 "Estatus_pago",
                 CASE
-                    WHEN "Cantidad_a_pagar" = 0 AND "Fecha_limite" <= "Fecha_pago" THEN 'Completado'
+                    WHEN "Estatus_pago" = true AND "Fecha_limite" <= "Fecha_pago" THEN 'Completado'
                     WHEN "Fecha_pago" <= "Fecha_limite" THEN 'A tiempo'
                     ELSE 'Atrasado'
                 END AS "Estado_pago"
@@ -506,7 +527,7 @@ def obtener_racha_pagos_a_tiempo(user_id):
                 public."Pagos"
             WHERE
                 "ID_usuario" = %s
-        ''', (user_id,))
+        , (user_id,))
         pagos = cur.fetchall()
 
         racha_actual = 0
@@ -535,7 +556,7 @@ def obtener_racha_pagos_a_tiempo(user_id):
         if cur is not None:
             cur.close()
         if conn is not None:
-            conn.close()
+            conn.close()'''
 
 
 # Método para obtener la suma de los pagos pendientes del usuario en el mes actual
@@ -567,7 +588,6 @@ def obtener_pagos_completados(user_id):
             FROM public."Pagos"
             WHERE "ID_usuario" = %s
             AND "Estatus_pago" = true
-            AND "Cantidad_a_pagar" = 0
             AND "Fecha_pago" <= "Fecha_limite"
             AND EXTRACT(MONTH FROM "Fecha_pago") = EXTRACT(MONTH FROM CURRENT_DATE);
         ''', (user_id,))

@@ -182,7 +182,10 @@
                 <ul>
                     {% for pago in pagos %}
                     <li>
-                        {{ pago[1] }} - {{ pago[2] }} - {{ pago[4] }}
+                        Nombre de pago: {{ pago[1] }}|
+                        Fecha creación: {{ pago[2] }}|
+                        Cantidad a pagar: {{ pago[5] }}|
+                        ID usuario:{{ pago[4] }}|
                         {% if not pago[3] %}
                         <!-- Si el pago no ha sido realizado -->
                         <form method="post" action="{{ url_for('pagar', grupo_id=grupo_id, pago_id=pago[0]) }}" style="display:inline;">

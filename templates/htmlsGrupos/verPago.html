@@ -165,7 +165,7 @@
             <li><a href="{{ url_for('Logout') }}">Cerrar Sesión</a></li>
         </ul>
     </nav>
-    <h2>Pagos del Grupo {{ grupo_id }}</h2>
+    
     <article>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -176,16 +176,19 @@
         </ul>
     {% endif %}
     {% endwith %}
+    <h2>Pagos del Grupo {{ grupo_id }}</h2>
     {% if pagos %}
         <ul>
             {% for pago in pagos %}
             <li>
-                {{ pago[1] }} - {{ pago[2] }} - {{ pago[5] }}
+                
+                Nombre de pago:{{ pago[1] }}|
+                Fecha creación: {{ pago[2] }}|
+                Cantidad a pagar: {{ pago[5] }}| 
+                ID Usuario: {{ pago[4] }}|
                 {% if not pago[3] %}
                 <!-- Si el pago no ha sido realizado -->
-                <form method="post" action="{{ url_for('pagar', grupo_id=grupo_id, pago_id=pago[0]) }}" style="display:inline;">
-                    <button type="submit">Pagar</button>
-                </form>
+                No ha pagado
                 {% endif %}
             </li>
             {% endfor %}
