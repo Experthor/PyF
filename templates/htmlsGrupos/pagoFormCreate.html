@@ -218,13 +218,13 @@
             <form method="post" action="{{ url_for('pagoFormCreate', grupo_id=grupo_id) }}">
                 {{ form.hidden_tag() }}
                 <label for="Nombre_pago">Nombre del Pago:</label>
-                {{ form.Nombre_pago(class="form-control", placeholder="Ingrese el nombre del pago") }}
+                {{ form.Nombre_pago(class="form-control", id="Nombre_pago", placeholder="Ingrese el nombre del pago") }}
 
-                <label for="Fecha_pago">Fecha del Pago:</label>
-                {{ form.Fecha_pago(class="form-control")}}
+                <label for="Fecha_limite">Fecha limite:</label>
+                {{ form.Fecha_limite(class="form-control", id="Fecha_limite")}}
 
                 <label for="Cantidad_a_pagar">Cantidad del Pago:</label>
-                {{ form.Cantidad_a_pagar(class="form-control")}}
+                {{ form.Cantidad_a_pagar(class="form-control", id="Cantidad_a_pagar")}}
 
                 <button type="submit">Crear Pago</button>
             </form>

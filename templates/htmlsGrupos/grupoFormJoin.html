@@ -211,7 +211,7 @@
             <li><a href="{{ url_for('Logout') }}">Cerrar Sesión</a></li>
         </ul>
     </nav>
-    <form method="POST" action="/htmlsGrupos/grupoFormJoin" class="form">
+    <form method="POST" action="{{url_for('grupoFormJoin')}}" class="form">
         <h3 class="subtitle">Unirme a un Grupo</h3>
         {{ form.hidden_tag() }}
         <label>{{ form.IdGrupo.label }}

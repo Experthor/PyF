@@ -4,7 +4,7 @@ from flask import Flask, render_template, url_for, request, redirect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from flask import flash
-import psycopg2
+import mysql.connector
 from conectar import conectar
 from wtforms import DateField, Form, StringField, PasswordField, SubmitField, validators
 from wtforms.validators import DataRequired
@@ -120,10 +120,10 @@ def grupoFormCreate():
         cur = conn.cursor()
         try:
             # Modifica la consulta para incluir el ID del usuario actual como ID_administrador
-            cur.execute('INSERT INTO "Grupos" ("Nombre_grupo", "ID_administrador", "Descripción", "Contrasena") VALUES (%s, %s, %s, %s);', (Nombre_grupo, id_usuario_actual, Descripción, Contrasena))
+            cur.execute('INSERT INTO Grupos (Nombre_grupo, ID_administrador, Descripción, Contrasena) VALUES (%s, %s, %s, %s);', (Nombre_grupo, id_usuario_actual, Descripción, Contrasena))
             conn.commit()
             flash('Grupo creado exitosamente', 'success')
-        except (psycopg2.DatabaseError, Exception) as error:
+        except (mysql.connector.DatabaseError, Exception) as error:
             print(error)
             # Maneja el error según tus necesidades
         finally:
@@ -155,13 +155,13 @@ def grupoFormJoin():
 
         try:
             # Verifica si el grupo existe y la contraseña es correcta
-            cur.execute('SELECT * FROM public."Grupos" WHERE "ID_grupo" = %s AND "Contrasena" = %s;', (IdGrupo, ContrasenaGrupo))
+            cur.execute('SELECT * FROM Grupos WHERE ID_grupo = %s AND Contrasena = %s;', (IdGrupo, ContrasenaGrupo))
             grupo_info = cur.fetchone()
 
             if grupo_info:
                 # Asigna el usuario actual como miembro del grupo
                 cur.execute('''
-                    INSERT INTO public."Pertenece" ("ID_usr", "ID_gru", "Fecha", "Administra")
+                    INSERT INTO Pertenece (ID_usr, ID_gru, Fecha, Administra)
                     VALUES (%s, %s, %s, %s);
                 ''', (current_user.id, IdGrupo, fecha_actual, False))
                 conn.commit()
@@ -169,7 +169,7 @@ def grupoFormJoin():
                 return redirect(url_for('gruposPertenece'))
             else:
                 print('error')
-        except (psycopg2.DatabaseError, Exception) as error:
+        except (mysql.connector.DatabaseError, Exception) as error:
             print(error)
 
         finally:
@@ -191,9 +191,9 @@ def gruposView():
     try:
         # Consulta para obtener información de todos los grupos del usuario actual
         cur.execute('''
-            SELECT "Nombre_grupo","ID_administrador", "Descripción", "Contrasena", "ID_grupo"
-            FROM public."Grupos"
-            WHERE "ID_administrador" = %s;
+            SELECT Nombre_grupo,ID_administrador, Descripción, Contrasena, ID_grupo
+            FROM Grupos
+            WHERE ID_administrador = %s;
         ''', (user_id,))
         grupos_info = cur.fetchall()
         print("Grupos obtenidos:", grupos_info)
@@ -202,7 +202,7 @@ def gruposView():
             return render_template("htmlsGrupos/gruposView.html", grupos_info=None)
         return render_template("htmlsGrupos/gruposView.html", grupos_info=grupos_info)
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
         # Maneja el error según tus necesidades
         return render_template("htmlsGrupos/gruposView.html", grupos_info=None)
@@ -222,15 +222,15 @@ def gruposPertenece():
     try:
         # Obtener los grupos a los que pertenece el usuario actual
         cur.execute('''
-            SELECT G."Nombre_grupo", G."ID_grupo"
-            FROM public."Grupos" G
-            JOIN public."Pertenece" P ON G."ID_grupo" = P."ID_gru"
-            WHERE P."ID_usr" = %s;
+            SELECT G.Nombre_grupo, G.ID_grupo
+            FROM Grupos G
+            JOIN Pertenece P ON G.ID_grupo = P.ID_gru
+            WHERE P.ID_usr = %s;
         ''', (current_user.id,))
         grupos_pertenecientes = cur.fetchall()
         return render_template("/htmlsGrupos/gruposPertenece.html", grupos_pertenecientes=grupos_pertenecientes)
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
     finally:
         if cur is not None:
@@ -254,7 +254,7 @@ def editarGrupo(grupo_id):
 
     try:
         # Obtener información actual del grupo
-        cur.execute('SELECT "Nombre_grupo", "Descripción", "Contrasena" FROM public."Grupos" WHERE "ID_grupo" = %s;', (grupo_id,))
+        cur.execute('SELECT Nombre_grupo, Descripción, Contrasena FROM Grupos WHERE ID_grupo = %s;', (grupo_id,))
         grupo_info = cur.fetchone()
 
         # Llenar el formulario con la información actual del grupo
@@ -264,14 +264,14 @@ def editarGrupo(grupo_id):
         if form.validate_on_submit():
             # Actualizar la información del grupo en la base de datos
             cur.execute('''
-                UPDATE public."Grupos"
-                SET "Nombre_grupo" = %s, "ID_administrador" = %s, "Descripción" = %s, "Contrasena" = %s
-                WHERE "ID_grupo" = %s;
+                UPDATE Grupos
+                SET Nombre_grupo = %s, ID_administrador = %s, Descripción = %s, Contrasena = %s
+                WHERE ID_grupo = %s;
             ''', (form.Nombre_grupo.data, id_usuario_actual, form.Descripción.data, form.Contrasena.data, grupo_id))
             conn.commit()
             return redirect(url_for('gruposView'))
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
 
     finally:
@@ -291,9 +291,9 @@ def eliminar_grupo(grupo_id):
     try:
         # Antes de eliminar el grupo, también debes eliminar las referencias en la tabla "Usuarios" y "Pertenece"
         # Aquí se asume que hay una relación en cascada configurada en la base de datos que eliminará las referencias en la tabla "Usuarios" y "Pertenece"
-        cur.execute('DELETE FROM public."Grupos" WHERE "ID_grupo" = %s;', (grupo_id,))
+        cur.execute('DELETE FROM Grupos WHERE ID_grupo = %s;', (grupo_id,))
         conn.commit()
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
     finally:
         if cur is not None:
@@ -312,10 +312,10 @@ def ver_miembros(grupo_id):
     try:
         # Obtener la lista de miembros del grupo
         cur.execute('''
-            SELECT "Nombre" FROM public."Usuarios"
-            WHERE "ID_usuario" IN (
-                SELECT "ID_usr" FROM public."Pertenece"
-                WHERE "ID_gru" = %s
+            SELECT Nombre FROM Usuarios
+            WHERE ID_usuario IN (
+                SELECT ID_usr FROM Pertenece
+                WHERE ID_gru = %s
             );
         ''', (grupo_id,))
 
@@ -323,7 +323,7 @@ def ver_miembros(grupo_id):
 
         return render_template("/htmlsGrupos/ver_miembros.html", grupo_id=grupo_id, miembros=miembros)
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
 
     finally:
@@ -344,16 +344,16 @@ def ver_pagos(grupo_id):
         id_usuario_actual = current_user.id
         # Obtener la lista de pagos del grupo
         cur.execute('''
-            SELECT "ID_pago", "Nombre_pago", "Fecha_creacion", "Estatus_pago", "ID_usuario", "Cantidad_a_pagar"
-            FROM public."Pagos"
-            WHERE "ID_grupo" = %s AND "ID_usuario" = %s;
+            SELECT ID_pago, Nombre_pago, Fecha_creacion, Estatus_pago, ID_usuario, Cantidad_a_pagar
+            FROM Pagos
+            WHERE ID_grupo = %s AND ID_usuario = %s;
         ''', (grupo_id, id_usuario_actual))
 
         pagos = cur.fetchall()
 
         return render_template("ver_pagos.html", grupo_id=grupo_id, pagos=pagos)
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
 
     finally:
@@ -374,18 +374,18 @@ def verPago(grupo_id):
         id_usuario_actual = current_user.id
         # Obtener la lista de pagos del grupo
         cur.execute('''
-            SELECT p."ID_pago", p."Nombre_pago", p."Fecha_creacion", p."Estatus_pago", p."Cantidad_a_pagar",
-                   u."ID_usuario", u."Nombre"
-            FROM public."Pagos" p
-            INNER JOIN public."Usuarios" u ON p."ID_usuario" = u."ID_usuario"
-            WHERE p."ID_grupo" = %s;
+            SELECT p.ID_pago, p.Nombre_pago, p.Fecha_creacion, p.Estatus_pago, p.Cantidad_a_pagar,
+                   u.ID_usuario, u.Nombre
+            FROM Pagos p
+            INNER JOIN Usuarios u ON p.ID_usuario = u.ID_usuario
+            WHERE p.ID_grupo = %s;
         ''', (grupo_id,))
 
         pagos = cur.fetchall()
 
         return render_template("ver_pagos.html", grupo_id=grupo_id, pagos=pagos)
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
 
     finally:
@@ -414,7 +414,7 @@ def pagoFormCreate(grupo_id):
 
     try:
         # Obtener información adicional sobre el grupo si es necesario
-        cur.execute('SELECT "Nombre_grupo", "ID_administrador", "Descripción" FROM public."Grupos" WHERE "ID_grupo" = %s;', (grupo_id,))
+        cur.execute('SELECT Nombre_grupo, ID_administrador, Descripción FROM Grupos WHERE ID_grupo = %s;', (grupo_id,))
         grupo_info = cur.fetchone()
 
         if not grupo_info:
@@ -426,7 +426,7 @@ def pagoFormCreate(grupo_id):
             nombre_pago = form.Nombre_pago.data
             cantidad_a_pagar = float(form.Cantidad_a_pagar.data)
             # Obtener miembros del grupo
-            cur.execute('SELECT "ID_usr" FROM public."Pertenece" WHERE "ID_gru" = %s;', (grupo_id,))
+            cur.execute('SELECT ID_usr FROM Pertenece WHERE ID_gru = %s;', (grupo_id,))
             miembros = cur.fetchall()
 
             # Lista para almacenar IDs de usuario
@@ -436,13 +436,13 @@ def pagoFormCreate(grupo_id):
             for miembro in miembros:
                 id_usuario = miembro[0]
                 ids_usuario.append(id_usuario)
-                cur.execute('INSERT INTO public."Pagos" ("ID_grupo", "ID_usuario", "Nombre_pago", "Fecha_creacion", "Fecha_limite", "Estatus_pago", "Cantidad_a_pagar") VALUES (%s, %s, %s, %s, %s, %s, %s);', (grupo_id, id_usuario, nombre_pago, fecha_creacion, fecha_pago, False, cantidad_a_pagar))
+                cur.execute('INSERT INTO Pagos (ID_grupo, ID_usuario, Nombre_pago, Fecha_creacion, Fecha_limite, Estatus_pago, Cantidad_a_pagar) VALUES (%s, %s, %s, %s, %s, %s, %s);', (grupo_id, id_usuario, nombre_pago, fecha_creacion, fecha_limite, False, cantidad_a_pagar))
 
             conn.commit()
             flash('Pago asignado.', 'success')
             return redirect(url_for('gruposView'))
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
         flash('Hubo un error al crear el pago', 'error')  # Agregar un mensaje flash de error
 
@@ -464,17 +464,17 @@ def pagar(grupo_id, pago_id):
 
     try:
         cur.execute('''
-            UPDATE public."Pagos"
-            SET "Estatus_pago" = TRUE,
-            "Fecha_pago" = CURRENT_DATE
-            WHERE "ID_pago" = %s;
+            UPDATE Pagos
+            SET Estatus_pago = TRUE,
+            Fecha_pago = CURRENT_DATE
+            WHERE ID_pago = %s;
         ''', (pago_id,))
 
         conn.commit()
 
         flash('Pago realizado con éxito', 'success')
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
         flash('Hubo un error al realizar el pago', 'error')
 
@@ -493,11 +493,11 @@ def obtener_cantidad_pagada(user_id):
     cur = conn.cursor()
     try:
         cur.execute('''
-            SELECT SUM("Cantidad_a_pagar")
-            FROM "Pagos"
-            WHERE "ID_usuario" = %s
-              AND "Estatus_pago" = true
-              AND EXTRACT(MONTH FROM "Fecha_pago") = EXTRACT(MONTH FROM CURRENT_DATE);
+            SELECT SUM(Cantidad_a_pagar)
+            FROM Pagos
+            WHERE ID_usuario = %s
+              AND Estatus_pago = true
+              AND EXTRACT(MONTH FROM Fecha_pago) = EXTRACT(MONTH FROM CURRENT_DATE);
         ''', (user_id,))
         cantidad_pagada = cur.fetchone()[0]
         return cantidad_pagada if cantidad_pagada else 0
@@ -524,7 +524,7 @@ def obtener_cantidad_pagada(user_id):
                     ELSE 'Atrasado'
                 END AS "Estado_pago"
             FROM
-                public."Pagos"
+                "Pagos"
             WHERE
                 "ID_usuario" = %s
         , (user_id,))
@@ -548,7 +548,7 @@ def obtener_cantidad_pagada(user_id):
         max_racha = max(max_racha, racha_actual)
 
         return racha_pagos_a_tiempo
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
         # Maneja el error según tus necesidades
         return []
@@ -565,11 +565,11 @@ def obtener_pagos_pendientes(user_id):
     cur = conn.cursor()
     try:
         cur.execute('''
-            SELECT COALESCE(SUM("Cantidad_a_pagar"), 0) as total_pendiente
-            FROM public."Pagos"
-            WHERE "ID_usuario" = %s
-            AND "Estatus_pago" = false
-            AND EXTRACT(MONTH FROM "Fecha_pago") = EXTRACT(MONTH FROM CURRENT_DATE);
+            SELECT COALESCE(SUM(Cantidad_a_pagar), 0) as total_pendiente
+            FROM Pagos
+            WHERE ID_usuario = %s
+            AND Estatus_pago = false
+            AND EXTRACT(MONTH FROM Fecha_pago) = EXTRACT(MONTH FROM CURRENT_DATE);
         ''', (user_id,))
         total_pendiente = cur.fetchone()[0]
         return total_pendiente if total_pendiente else 0
@@ -584,17 +584,17 @@ def obtener_pagos_completados(user_id):
     cur = conn.cursor()
     try:
         cur.execute('''
-            SELECT COUNT("ID_pago") as total_completado
-            FROM public."Pagos"
-            WHERE "ID_usuario" = %s
-            AND "Estatus_pago" = true
-            AND "Fecha_pago" <= "Fecha_limite"
-            AND EXTRACT(MONTH FROM "Fecha_pago") = EXTRACT(MONTH FROM CURRENT_DATE);
+            SELECT COUNT(ID_pago) as total_completado
+            FROM Pagos
+            WHERE ID_usuario = %s
+            AND Estatus_pago = true
+            AND Fecha_pago <= Fecha_limite
+            AND EXTRACT(MONTH FROM Fecha_pago) = EXTRACT(MONTH FROM CURRENT_DATE);
         ''', (user_id,))
         total_completado = cur.fetchone()[0]
         return total_completado if total_completado else 0
 
-    except (psycopg2.DatabaseError, Exception) as error:
+    except (mysql.connector.DatabaseError, Exception) as error:
         print(error)
         # Maneja el error según tus necesidades
         return 0
@@ -617,9 +617,9 @@ def SignIn():
         conn = conectar()
         cur = conn.cursor()
         try:
-            cur.execute('INSERT INTO "Usuarios" ("Nickname", "Nombre", "Apellidos", "Correo", "Contrasena") VALUES (%s, %s, %s, %s, %s);', (Nickname, Nombre, Apellidos, Correo, Contrasena))
+            cur.execute('INSERT INTO usuarios (Nickname, Nombre, Apellidos, Correo, Contrasena) VALUES (%s, %s, %s, %s, %s);', (Nickname, Nombre, Apellidos, Correo, Contrasena))
             conn.commit()
-        except (psycopg2.DatabaseError, Exception) as error:
+        except (mysql.connector.DatabaseError, Exception) as error:
             print(error)
             # Maneja el error según tus necesidades
         finally:
@@ -635,7 +635,6 @@ def SignIn():
 #Render para el formulario de ingreso
 @app.route("/LogIn", methods=['POST'])
 def LogIn():
-    logout_user()
     form=LoginForm()
     if form.validate_on_submit and request.method=='POST':
         Correo=form.Correo.data
@@ -646,7 +645,7 @@ def LogIn():
         try:
             conn = conectar()
             cur=conn.cursor()
-            cur.execute('SELECT "Correo", "Contrasena", "ID_usuario" FROM "Usuarios" WHERE "Correo" = %s AND "Contrasena" = %s;', (Correo, Contrasena))
+            cur.execute('SELECT Correo, Contrasena, ID_usuario FROM usuarios WHERE Correo = %s AND Contrasena = %s;', (Correo, Contrasena))
             r = cur.fetchall()
             if len(r) == 0:
                 print('1')
@@ -657,7 +656,7 @@ def LogIn():
                 user_id = r[0][2]
                 user = User(user_id)
                 login_user(user)
-        except (psycopg2.DatabaseError, Exception) as error:
+        except (mysql.connector.DatabaseError, Exception) as error:
             print(type(error))
             if str(error)==no_match:
                 print('1')

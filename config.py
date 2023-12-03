@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 
-def config(archivo="PyFinnance.ini", seccion="postgresql"):
+def config(archivo="PyFinnance.ini", seccion="mysql"):
     parser = ConfigParser()
     parser.read(archivo)
 
